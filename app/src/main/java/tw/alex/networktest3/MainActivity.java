@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -35,6 +36,7 @@ import org.w3c.dom.Text;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -75,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void init(){
         sdroot = Environment.getExternalStorageDirectory();
+        Log.v("alex", "" + sdroot);
         mesg = findViewById(R.id.message);
         list = findViewById(R.id.list);
         input = findViewById(R.id.input);
@@ -253,6 +256,41 @@ public class MainActivity extends AppCompatActivity {
 
         queue.add(request);
 
+
+    }
+
+    public void test5(View view) {
+        File upload = new File(sdroot, "alex.pdf");
+        try {
+            FileInputStream fin = new FileInputStream(upload);
+            byte[] buf = new byte[(int)upload.length()];
+            fin.read(buf);
+            fin.close();
+            final byte[] sendData = buf;
+
+
+        VolleyMultipartRequest request =
+                new VolleyMultipartRequest(Request.Method.POST, "http://192.168.201.160:8080/JavaEE/Alex11", new Response.Listener<NetworkResponse>() {
+                    @Override
+                    public void onResponse(NetworkResponse response) {
+                        Log.v("alex", new String(response.data));
+                    }
+                }, null){
+                    @Override
+                    protected Map<String, DataPart> getByteData() throws AuthFailureError {
+
+                        HashMap<String, DataPart> params = new HashMap<>();
+                        DataPart dataPart = new DataPart("alex4.pdf", sendData);
+                        params.put("upload", dataPart);
+
+                        return params;
+                    }
+                };
+
+        queue.add(request);
+        }catch (Exception e){
+            Log.v("alex", e.toString());
+        }
 
     }
 
